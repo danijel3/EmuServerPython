@@ -12,9 +12,9 @@ Installable using *pip* or *easy_install*:
 # usage
 
 Simply run **python ServerMain.py [setings.json]**. It will open a server at the given port. You can connect to it from 
-[EMU-webApp](http://ips-lmu.github.io/EMU-webApp/) (click the connect button) and enter the following IP:
+[EMU-webApp](http://ips-lmu.github.io/EMU-webApp/) (click the connect button) and enter the following address:
 
-  ws://[your-ip-address]:[chosen-port]/[optional-websocket-path]
+    ws://[your-ip-address]:[chosen-port]/[optional-websocket-path]
 
 By changing the websocket path you can share multiple databases.
 
