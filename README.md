@@ -28,5 +28,8 @@ A JSON with the following structure:
             "/another-websocket-path": "/path/to/another/db",             
         }, 
         "port": 17890, 
-        "default_db": "/path/to/default/db"
+        "default_db": "/path/to/default/db",
+        "authorize": False,
+        "user": "user",
+        "pass": "pass"
     }
