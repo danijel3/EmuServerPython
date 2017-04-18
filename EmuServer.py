@@ -46,8 +46,8 @@ class EmuServerProtocol(WebSocketServerProtocol):
             else:
                 self.sendMessage(json.dumps(self.getReply('NO')))
         elif type == 'LOGONUSER':
-            user = request['data']['userName']
-            passwd = request['data']['pwd']
+            user = request['userName']
+            passwd = request['pwd']
             if user != settings['user']:
                 self.sendMessage(json.dumps(self.getReply('BADUSERNAME')))
             elif passwd != settings['pass']:
