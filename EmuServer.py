@@ -3,6 +3,7 @@ from collections import OrderedDict
 import json
 
 from EmuDatabase import getDatabase
+from Settings import settings
 
 
 # dummy Future implementation
@@ -40,7 +41,19 @@ class EmuServerProtocol(WebSocketServerProtocol):
         if type == 'GETPROTOCOL':
             self.sendMessage(json.dumps(self.getReply(self.dataProtocol())))
         elif type == 'GETDOUSERMANAGEMENT':
-            self.sendMessage(json.dumps(self.getReply('NO')))
+            if settings['authorize']:
+                self.sendMessage(json.dumps(self.getReply('YES')))
+            else:
+                self.sendMessage(json.dumps(self.getReply('NO')))
+        elif type == 'LOGONUSER':
+            user = request['data']['userName']
+            passwd = request['data']['pwd']
+            if user != settings['user']:
+                self.sendMessage(json.dumps(self.getReply('BADUSERNAME')))
+            elif passwd != settings['pass']:
+                self.sendMessage(json.dumps(self.getReply('BADPASSWORD')))
+            else:
+                self.sendMessage(json.dumps(self.getReply('LOGGEDON')))
         elif type == 'GETGLOBALDBCONFIG':
             self.sendMessage(json.dumps(self.getReply(self.db.getConfig())))
         elif type == 'GETBUNDLELIST':
@@ -52,9 +65,14 @@ class EmuServerProtocol(WebSocketServerProtocol):
         elif type == 'DISCONNECTWARNING':
             self.sendMessage(json.dumps(self.getReply(None)))
         elif type == 'SAVEBUNDLE':
-            self.sendMessage(json.dumps(self.getReply(None,msg='Save bundle not supported by this server')))
+            session = request['data']['session']
+            bundle = request['data']['annotation']['name']
+            data = request['data']
+            self.db.saveBundle(session, bundle, data)
+            self.sendMessage(json.dumps(self.getReply(None)))
         elif type == 'SAVECONFIG':
-            self.sendMessage(json.dumps(self.getReply(None, msg='Save configuration not supported by this server')))
+            self.db.saveConfig(request['data'])
+            self.sendMessage(json.dumps(self.getReply(None)))
         else:
             print 'NYI ' + type
             self.sendMessage(json.dumps(self.getError('NYI: {}'.format(type))))

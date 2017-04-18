@@ -28,6 +28,10 @@ class Database:
 
         return obj
 
+    def saveConfig(self, data):
+        with open(self.config_file, 'w') as f:
+            json.dump(data, f)
+
     def getBundleList(self):
         list = []
         sessions = glob.glob(self.path + '/*_ses')
@@ -37,7 +41,7 @@ class Database:
             for bndl in bundles:
                 bndlname = basename(bndl)[:-5]
                 list.append({'name': bndlname, 'session': sessname})
-        list=sorted(list,key=lambda el: el['session']+'_'+el['name'])
+        list = sorted(list, key=lambda el: el['session'] + '_' + el['name'])
         return list
 
     def getBundle(self, session, bundle):
@@ -69,6 +73,28 @@ class Database:
     def getFile(self, path):
         with open(path) as f:
             return base64.b64encode(f.read())
+
+    def saveBundle(self, session, bundle, data):
+
+        bdnl_path = '{}/{}_ses/{}_bndl'.format(self.path, session, bundle)
+
+        for f in data['ssffFiles']:
+            fp = '{}/{}.{}'.format(bdnl_path, bundle, f['fileExtension'])
+            assert f['encoding'] == 'BASE64', 'Only BASE64 encoding supported!'
+            self.saveFile(fp, f['data'])
+
+        if 'mediaFile' in data and len(data['mediaFile']['data']) > 0:
+            fp = '{}/{}.wav'.format(bdnl_path, bundle)
+            assert data['mediaFile']['encoding'] == 'BASE64', 'Only BASE64 encoding supported!'
+            self.saveFile(fp, data['mediaFile']['data'])
+
+        annot = data['annotation']
+        with open('{}/{}_annot.json'.format(bdnl_path, bundle), 'w') as f:
+            json.dump(annot, f)
+
+    def saveFile(self, path, data):
+        with open(path, 'w') as f:
+            f.write(base64.b64decode(data))
 
 
 def getDatabase(path):
