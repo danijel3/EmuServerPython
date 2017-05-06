@@ -25,7 +25,7 @@ A JSON with the following structure:
 
     {
         "port": 17890, 
-        'logFile': None,
-        'daemonize': False,
-        'pid': 'emu_server.pid'
+        "logFile": None,
+        "daemonize": False,
+        "pid": "emu_server.pid"
     }
