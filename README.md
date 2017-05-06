@@ -14,22 +14,18 @@ Installable using *pip* or *easy_install*:
 Simply run **python ServerMain.py [setings.json]**. It will open a server at the given port. You can connect to it from 
 [EMU-webApp](http://ips-lmu.github.io/EMU-webApp/) (click the connect button) and enter the following address:
 
-    ws://[your-ip-address]:[chosen-port]/[optional-websocket-path]
+    ws://[your-ip-address]:[chosen-port]/[mongo_project_id]/[tool_name]
 
-By changing the websocket path you can share multiple databases.
+This branch is specifically for the Clarin-PL speech tools website. The path refers to the IDs in the MongoDB of the 
+website. The server automatically looks for the path and verifies the password if it exists.
 
 ## Settings
 
 A JSON with the following structure:
 
     {
-        "db_map": {
-            "/websocket-path": "/path/to/db",
-            "/another-websocket-path": "/path/to/another/db",             
-        }, 
         "port": 17890, 
-        "default_db": "/path/to/default/db",
-        "authorize": False,
-        "user": "user",
-        "pass": "pass"
+        'logFile': None,
+        'daemonize': False,
+        'pid': 'emu_server.pid'
     }
