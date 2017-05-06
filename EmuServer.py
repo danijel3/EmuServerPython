@@ -5,7 +5,6 @@ from autobahn.twisted.websocket import WebSocketServerProtocol
 from twisted.python import log
 
 from EmuDatabase import get_database
-from Settings import get_setting
 
 
 # dummy Future implementation
@@ -41,22 +40,23 @@ class EmuServerProtocol(WebSocketServerProtocol):
 
         if not self.db:
             self.sendMessage(json.dumps(self.get_error('Cannot find database: ' + self.path)))
+            return
 
         req_type = request['type']
 
         if req_type == 'GETPROTOCOL':
             self.sendMessage(json.dumps(self.get_reply(self.data_protocol())))
         elif req_type == 'GETDOUSERMANAGEMENT':
-            if get_setting('authorize'):
+            if self.db.username and self.db.password:
                 self.sendMessage(json.dumps(self.get_reply('YES')))
             else:
                 self.sendMessage(json.dumps(self.get_reply('NO')))
         elif req_type == 'LOGONUSER':
-            user = request['userName']
-            password = request['pwd']
-            if user != get_setting('user'):
+            user = self.db.username
+            password = self.db.password
+            if user != self.db.username:
                 self.sendMessage(json.dumps(self.get_reply('BADUSERNAME')))
-            elif password != get_setting('pass'):
+            elif not self.db.check_password(password):
                 self.sendMessage(json.dumps(self.get_reply('BADPASSWORD')))
             else:
                 self.sendMessage(json.dumps(self.get_reply('LOGGEDON')))

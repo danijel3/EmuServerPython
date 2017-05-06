@@ -1,12 +1,6 @@
 import json
 
 settings = {'port': 17890,
-            'default_db': '/path/to/default/db',
-            'db_map': {'/one': '/path/to/one/db',
-                       '/two': '/path/to/two/db'},
-            'authorize': False,
-            'user': 'user',
-            'pass': 'pass',
             'logFile': None,
             'daemonize': False,
             'pid': 'emu_server.pid'}

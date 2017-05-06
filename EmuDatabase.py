@@ -3,16 +3,20 @@ import glob
 import json
 import logging
 from collections import OrderedDict
-from os.path import basename
+from os.path import basename, dirname, realpath
+from subprocess import call
 
+from pymongo import MongoClient
 from twisted.python import log
 
-from Settings import get_setting
+verify_script = dirname(realpath(__file__)) + '/verify.php'
 
 
 class Database:
-    def __init__(self, path):
+    def __init__(self, path, username=None, password=None):
         self.path = path
+        self.username = username
+        self.password = password
 
         files = glob.glob('{}/*_DBconfig.json'.format(path))
         if len(files) == 0:
@@ -103,11 +107,42 @@ class Database:
         with open('{}/{}_annot.json'.format(bundle_path, bundle), 'w') as f:
             json.dump(annotation, f)
 
+    def check_password(self, password):
+        res = call(['php', verify_script, password, self.password])
+        return res == 0
+
+
+client = MongoClient()
+
 
 def get_database(path):
-    if path == '/':
-        return Database(get_setting('default_db'))
-    elif path in get_setting('db_map'):
-        return Database(get_setting('db_map')[path])
-    else:
+    tok = path[1:].split('/')
+    if len(tok) != 2:
+        log.msg('Wrong number of tokens in path: ' + path, logLevel=logging.WARN)
         return None
+
+    id = tok[0]
+    tool = tok[1]
+
+    project = client.clarin.projects.find_one({"_id": id})
+
+    if not project:
+        log.msg('project id not found: ' + id, logLevel=logging.WARN)
+        return None
+
+    proj_path = project['path']
+    db_path = '{}/{}/emuDB'.format(proj_path, tool)
+
+    if len(glob.glob('{}/*_DBconfig.json'.format(db_path))) == 0:
+        log.msg('EmuDB not found in path: ' + db_path, logLevel=logging.WARN)
+        return None
+
+    username = None
+    password = None
+
+    if 'user' in project:
+        username = project['user']
+    if 'password' in project:
+        password = project['password']
+
+    return Database(db_path, username, password)
