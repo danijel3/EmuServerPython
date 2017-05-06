@@ -92,7 +92,7 @@ class Database:
 
     def save_bundle(self, session, bundle, data):
 
-        bundle_path = '{}/{}_ses/{}_bundle'.format(self.path, session, bundle)
+        bundle_path = '{}/{}_ses/{}_bndl'.format(self.path, session, bundle)
 
         for f in data['ssffFiles']:
             fp = '{}/{}.{}'.format(bundle_path, bundle, f['fileExtension'])
