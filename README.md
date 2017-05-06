@@ -31,5 +31,8 @@ A JSON with the following structure:
         "default_db": "/path/to/default/db",
         "authorize": False,
         "user": "user",
-        "pass": "pass"
+        "pass": "pass",
+        "logFile": None,
+        "daemonize": False,
+        "pid": "emu_server.pid"
     }
