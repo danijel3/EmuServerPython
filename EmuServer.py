@@ -1,32 +1,38 @@
-from autobahn.twisted.websocket import WebSocketServerProtocol
-from collections import OrderedDict
 import json
+from collections import OrderedDict
 
-from EmuDatabase import getDatabase
-from Settings import settings
+from autobahn.twisted.websocket import WebSocketServerProtocol
+from twisted.python import log
+
+from EmuDatabase import get_database
+from Settings import get_setting
 
 
 # dummy Future implementation
 class Future:
+    def __init__(self):
+        pass
+
     def callback(self, result):
         pass
 
 
 class EmuServerProtocol(WebSocketServerProtocol):
     def __init__(self):
+        self.path = None
         self.callbackID = None
         self.db = None
         self.is_closed = Future()
 
     def onConnect(self, request):
-        print("Client connecting: {0}".format(request.peer))
+        log.msg("Client connecting: {0}".format(request.peer))
         self.path = request.path
-        self.db = getDatabase(request.path)
+        self.db = get_database(request.path)
 
-    def onMessage(self, payload, isBinary):
+    def onMessage(self, payload, is_binary):
 
-        if isBinary:
-            self.sendMessage(json.dumps(self.getError('Received binary data!')))
+        if is_binary:
+            self.sendMessage(json.dumps(self.get_error('Received binary data!')))
             return
 
         request = json.loads(payload)
@@ -34,50 +40,50 @@ class EmuServerProtocol(WebSocketServerProtocol):
         self.callbackID = request['callbackID']
 
         if not self.db:
-            self.sendMessage(json.dumps(self.getError('Cannot find database: ' + self.path)))
+            self.sendMessage(json.dumps(self.get_error('Cannot find database: ' + self.path)))
 
-        type = request['type']
+        req_type = request['type']
 
-        if type == 'GETPROTOCOL':
-            self.sendMessage(json.dumps(self.getReply(self.dataProtocol())))
-        elif type == 'GETDOUSERMANAGEMENT':
-            if settings['authorize']:
-                self.sendMessage(json.dumps(self.getReply('YES')))
+        if req_type == 'GETPROTOCOL':
+            self.sendMessage(json.dumps(self.get_reply(self.data_protocol())))
+        elif req_type == 'GETDOUSERMANAGEMENT':
+            if get_setting('authorize'):
+                self.sendMessage(json.dumps(self.get_reply('YES')))
             else:
-                self.sendMessage(json.dumps(self.getReply('NO')))
-        elif type == 'LOGONUSER':
+                self.sendMessage(json.dumps(self.get_reply('NO')))
+        elif req_type == 'LOGONUSER':
             user = request['userName']
-            passwd = request['pwd']
-            if user != settings['user']:
-                self.sendMessage(json.dumps(self.getReply('BADUSERNAME')))
-            elif passwd != settings['pass']:
-                self.sendMessage(json.dumps(self.getReply('BADPASSWORD')))
+            password = request['pwd']
+            if user != get_setting('user'):
+                self.sendMessage(json.dumps(self.get_reply('BADUSERNAME')))
+            elif password != get_setting('pass'):
+                self.sendMessage(json.dumps(self.get_reply('BADPASSWORD')))
             else:
-                self.sendMessage(json.dumps(self.getReply('LOGGEDON')))
-        elif type == 'GETGLOBALDBCONFIG':
-            self.sendMessage(json.dumps(self.getReply(self.db.getConfig())))
-        elif type == 'GETBUNDLELIST':
-            self.sendMessage(json.dumps(self.getReply(self.db.getBundleList())))
-        elif type == 'GETBUNDLE':
+                self.sendMessage(json.dumps(self.get_reply('LOGGEDON')))
+        elif req_type == 'GETGLOBALDBCONFIG':
+            self.sendMessage(json.dumps(self.get_reply(self.db.get_config())))
+        elif req_type == 'GETBUNDLELIST':
+            self.sendMessage(json.dumps(self.get_reply(self.db.get_bundle_list())))
+        elif req_type == 'GETBUNDLE':
             session = request['session']
             bundle = request['name']
-            self.sendMessage(json.dumps(self.getReply(self.db.getBundle(session, bundle))))
-        elif type == 'DISCONNECTWARNING':
-            self.sendMessage(json.dumps(self.getReply(None)))
-        elif type == 'SAVEBUNDLE':
+            self.sendMessage(json.dumps(self.get_reply(self.db.get_bundle(session, bundle))))
+        elif req_type == 'DISCONNECTWARNING':
+            self.sendMessage(json.dumps(self.get_reply(None)))
+        elif req_type == 'SAVEBUNDLE':
             session = request['data']['session']
             bundle = request['data']['annotation']['name']
             data = request['data']
-            self.db.saveBundle(session, bundle, data)
-            self.sendMessage(json.dumps(self.getReply(None)))
-        elif type == 'SAVECONFIG':
-            self.db.saveConfig(request['data'])
-            self.sendMessage(json.dumps(self.getReply(None)))
+            self.db.save_bundle(session, bundle, data)
+            self.sendMessage(json.dumps(self.get_reply(None)))
+        elif req_type == 'SAVECONFIG':
+            self.db.save_config(request['data'])
+            self.sendMessage(json.dumps(self.get_reply(None)))
         else:
-            print 'NYI ' + type
-            self.sendMessage(json.dumps(self.getError('NYI: {}'.format(type))))
+            log.msg('NYI ' + req_type)
+            self.sendMessage(json.dumps(self.get_error('NYI: {}'.format(req_type))))
 
-    def getError(self, msg):
+    def get_error(self, msg):
         res = OrderedDict()
         res['callbackID'] = self.callbackID
         status = OrderedDict()
@@ -87,21 +93,23 @@ class EmuServerProtocol(WebSocketServerProtocol):
 
         return res
 
-    def getSuccessStatus(self, msg=''):
+    @staticmethod
+    def get_success_status(msg=''):
         status = OrderedDict()
         status['type'] = 'SUCCESS'
         status['message'] = msg
         return status
 
-    def getReply(self, data, msg=''):
+    def get_reply(self, data, msg=''):
         res = OrderedDict()
         res['callbackID'] = self.callbackID
         if data:
             res['data'] = data
-        res['status'] = self.getSuccessStatus(msg)
+        res['status'] = self.get_success_status(msg)
         return res
 
-    def dataProtocol(self):
+    @staticmethod
+    def data_protocol():
         data = OrderedDict()
         data['protocol'] = 'EMU-webApp-websocket-protocol'
         data['version'] = '0.0.2'
