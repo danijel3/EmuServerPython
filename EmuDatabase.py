@@ -6,6 +6,7 @@ from collections import OrderedDict
 from os.path import basename, dirname, realpath
 from subprocess import call
 
+from bson.objectid import ObjectId
 from pymongo import MongoClient
 from twisted.python import log
 
@@ -124,7 +125,7 @@ def get_database(path):
     id = tok[0]
     tool = tok[1]
 
-    project = client.clarin.projects.find_one({"_id": id})
+    project = client.clarin.projects.find_one({"_id": ObjectId(id)})
 
     if not project:
         log.msg('project id not found: ' + id, logLevel=logging.WARN)
