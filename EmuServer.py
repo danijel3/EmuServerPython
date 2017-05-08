@@ -71,13 +71,15 @@ class EmuServerProtocol(WebSocketServerProtocol):
         elif req_type == 'DISCONNECTWARNING':
             self.sendMessage(json.dumps(self.get_reply(None)))
         elif req_type == 'SAVEBUNDLE':
-            session = request['data']['session']
-            bundle = request['data']['annotation']['name']
-            data = request['data']
-            self.db.save_bundle(session, bundle, data)
+            if not get_setting('readonly'):
+                session = request['data']['session']
+                bundle = request['data']['annotation']['name']
+                data = request['data']
+                self.db.save_bundle(session, bundle, data)
             self.sendMessage(json.dumps(self.get_reply(None)))
         elif req_type == 'SAVECONFIG':
-            self.db.save_config(request['data'])
+            if not get_setting('readonly'):
+                self.db.save_config(request['data'])
             self.sendMessage(json.dumps(self.get_reply(None)))
         else:
             log.msg('NYI ' + req_type)

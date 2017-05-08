@@ -32,7 +32,8 @@ A JSON with the following structure:
         "authorize": False,
         "user": "user",
         "pass": "pass",
-        "logFile": None,
-        "daemonize": False,
-        "pid": "emu_server.pid"
+        "logFile": null,
+        "daemonize": false,
+        "pid": "emu_server.pid",
+        "readonly": false
     }

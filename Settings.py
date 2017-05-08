@@ -9,7 +9,8 @@ settings = {'port': 17890,
             'pass': 'pass',
             'logFile': None,
             'daemonize': False,
-            'pid': 'emu_server.pid'}
+            'pid': 'emu_server.pid',
+            'readonly': False}
 
 
 def get_setting(name):
