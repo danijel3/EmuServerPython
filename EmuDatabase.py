@@ -1,5 +1,6 @@
 import base64
 import codecs
+import hashlib
 import os
 from collections import OrderedDict
 
@@ -23,9 +24,20 @@ def get_file(work_dir, id):
         return base64.b64encode(f.read())
 
 
+def file_hash(filename):
+    h = hashlib.sha1()
+    with open(filename, 'rb', buffering=0) as f:
+        for b in iter(lambda: f.read(128 * 1024), b''):
+            h.update(b)
+    return h.hexdigest()
+
+
 def save_file(work_dir, id, data):
-    with codecs.open(get_file_path(work_dir, id), mode='w', encoding='utf-8') as f:
+    path = get_file_path(work_dir, id)
+    with codecs.open(path, mode='w', encoding='utf-8') as f:
         f.write(data)
+    hash = file_hash(path)
+    db.clarin.resources.update_one({'_id': ObjectId(id)}, {'hash': hash})
 
 
 class Database:
