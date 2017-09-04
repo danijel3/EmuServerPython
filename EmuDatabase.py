@@ -1,5 +1,6 @@
 import base64
 import codecs
+import datetime
 import hashlib
 import os
 from collections import OrderedDict
@@ -32,12 +33,14 @@ def file_hash(filename):
     return h.hexdigest()
 
 
+# TODO make new version instead of modifying in-place?
 def save_file(work_dir, id, data):
     path = get_file_path(work_dir, id)
     with codecs.open(path, mode='w', encoding='utf-8') as f:
         f.write(data)
     hash = file_hash(path)
-    db.clarin.resources.update_one({'_id': ObjectId(id)}, {'hash': hash})
+    db.clarin.resources.update_one({'_id': ObjectId(id)},
+                                   {'hash': hash, 'modified': datetime.datetime.utcnow(), 'from.task': 'emu-sdms'})
 
 
 class Database:
