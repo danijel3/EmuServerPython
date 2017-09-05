@@ -40,7 +40,8 @@ def save_file(work_dir, id, data):
         f.write(data)
     hash = file_hash(path)
     db.clarin.resources.update_one({'_id': ObjectId(id)}, {
-        '$set': {'hash': hash, 'modified': datetime.datetime.utcnow(), 'from.task': 'emu-sdms'}})
+        '$set': {'hash': hash, 'modified': datetime.datetime.utcnow(), 'from.task': 'emu-sdms',
+                 'from_hash': 'invalid'}})
 
 
 class Database:
