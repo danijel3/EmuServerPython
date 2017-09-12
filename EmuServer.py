@@ -26,7 +26,7 @@ class EmuServerProtocol(WebSocketServerProtocol):
         self.is_closed = Future()
 
     def onConnect(self, request):
-        log.msg("Client connecting: {0}".format(request.peer))
+        log.msg(u"Client connecting: {0}".format(request.peer))
         self.path = request.path
         self.db = get_database(request.path)
 
@@ -84,7 +84,7 @@ class EmuServerProtocol(WebSocketServerProtocol):
             self.sendMessage(json.dumps(self.get_reply(None)))
         else:
             log.msg('NYI ' + req_type)
-            self.sendMessage(json.dumps(self.get_error('NYI: {}'.format(req_type))))
+            self.sendMessage(json.dumps(self.get_error(u'NYI: {}'.format(req_type))))
 
     def get_error(self, msg):
         res = OrderedDict()
