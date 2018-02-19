@@ -56,10 +56,6 @@ class EmuServerProtocol(WebSocketServerProtocol):
             # user = request['userName']
             password = request['pwd']
             # self.sendMessage(self.get_reply('BADUSERNAME')),
-            print(bcrypt.hashpw(password.encode('utf-8'), self.db.password))
-            print(self.db.password)
-            print(type(bcrypt.hashpw(password.encode('utf-8'), self.db.password)))
-            print(type(self.db.password))
             if bcrypt.hashpw(password.encode('utf-8'), self.db.password) != self.db.password:
                 self.sendMessage(self.get_reply('BADPASSWORD'))
             else:
