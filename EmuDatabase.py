@@ -21,8 +21,8 @@ def get_file_path(work_dir, id):
 
 
 def get_file(work_dir, id):
-    with open(get_file_path(work_dir, id)) as f:
-        return base64.b64encode(f.read())
+    with open(get_file_path(work_dir, id), 'rb') as f:
+        return base64.b64encode(f.read()).decode('utf-8')
 
 
 def file_hash(filename):
@@ -62,7 +62,7 @@ class Database:
 
     def get_bundle_list(self):
         bundle_list = []
-        for name, bundle in self.proj['bundles'].iteritems():
+        for name, bundle in self.proj['bundles'].items():
             if 'seg' in bundle and 'audio' in bundle:
                 bundle_list.append({'name': name, 'session': bundle['session']})
         bundle_list = sorted(bundle_list, key=lambda el: el['session'] + '_' + el['name'])

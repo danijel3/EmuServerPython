@@ -26,14 +26,14 @@ class EmuServerProtocol(WebSocketServerProtocol):
         self.is_closed = Future()
 
     def onConnect(self, request):
-        log.msg(u"Client connecting: {0}".format(request.peer))
+        log.msg("Client connecting: {0}".format(request.peer))
         self.path = request.path
         self.db = get_database(request.path)
 
     def onMessage(self, payload, is_binary):
 
         if is_binary:
-            self.sendMessage(json.dumps(self.get_error('Received binary data!')))
+            self.sendMessage(self.get_error('Received binary data!'))
             return
 
         request = json.loads(payload)
@@ -41,74 +41,74 @@ class EmuServerProtocol(WebSocketServerProtocol):
         self.callbackID = request['callbackID']
 
         if not self.db:
-            self.sendMessage(json.dumps(self.get_error('Cannot find database: ' + self.path)))
+            self.sendMessage(self.get_error('Cannot find database: ' + self.path))
 
         req_type = request['type']
 
         if req_type == 'GETPROTOCOL':
-            self.sendMessage(json.dumps(self.get_reply(self.data_protocol())))
+            self.sendMessage(self.get_reply(self.data_protocol()))
         elif req_type == 'GETDOUSERMANAGEMENT':
             if self.db.password:
-                self.sendMessage(json.dumps(self.get_reply('YES')))
+                self.sendMessage(self.get_reply('YES'))
             else:
-                self.sendMessage(json.dumps(self.get_reply('NO')))
+                self.sendMessage(self.get_reply('NO'))
         elif req_type == 'LOGONUSER':
             # user = request['userName']
             password = request['pwd']
-            # self.sendMessage(json.dumps(self.get_reply('BADUSERNAME')))
-            if bcrypt.hashpw(password.encode('utf-8'), self.db.password) != str(self.db.password):
-                self.sendMessage(json.dumps(self.get_reply('BADPASSWORD')))
+            # self.sendMessage(self.get_reply('BADUSERNAME')),
+            print(bcrypt.hashpw(password.encode('utf-8'), self.db.password))
+            print(self.db.password)
+            print(type(bcrypt.hashpw(password.encode('utf-8'), self.db.password)))
+            print(type(self.db.password))
+            if bcrypt.hashpw(password.encode('utf-8'), self.db.password) != self.db.password:
+                self.sendMessage(self.get_reply('BADPASSWORD'))
             else:
-                self.sendMessage(json.dumps(self.get_reply('LOGGEDON')))
+                self.sendMessage(self.get_reply('LOGGEDON'))
         elif req_type == 'GETGLOBALDBCONFIG':
-            self.sendMessage(json.dumps(self.get_reply(self.db.get_config())))
+            self.sendMessage(self.get_reply(self.db.get_config()))
         elif req_type == 'GETBUNDLELIST':
-            self.sendMessage(json.dumps(self.get_reply(self.db.get_bundle_list())))
+            self.sendMessage(self.get_reply(self.db.get_bundle_list()))
         elif req_type == 'GETBUNDLE':
             session = request['session']
             bundle = request['name']
-            self.sendMessage(json.dumps(self.get_reply(self.db.get_bundle(session, bundle))))
+            self.sendMessage(self.get_reply(self.db.get_bundle(session, bundle)))
         elif req_type == 'DISCONNECTWARNING':
-            self.sendMessage(json.dumps(self.get_reply(None)))
+            self.sendMessage(self.get_reply(None))
         elif req_type == 'SAVEBUNDLE':
             if not get_setting('readonly'):
                 session = request['data']['session']
                 bundle = request['data']['annotation']['name']
                 data = request['data']
                 self.db.save_bundle(session, bundle, data)
-            self.sendMessage(json.dumps(self.get_reply(None)))
+            self.sendMessage(self.get_reply(None))
         elif req_type == 'SAVECONFIG':
             if not get_setting('readonly'):
                 self.db.save_config(request['data'])
-            self.sendMessage(json.dumps(self.get_reply(None)))
+            self.sendMessage(self.get_reply(None))
         else:
             log.msg('NYI ' + req_type)
-            self.sendMessage(json.dumps(self.get_error(u'NYI: {}'.format(req_type))))
+            self.sendMessage(self.get_error('NYI: {}'.format(req_type)))
 
     def get_error(self, msg):
         res = OrderedDict()
         res['callbackID'] = self.callbackID
-        status = OrderedDict()
-        res['status'] = status
-        status['type'] = 'ERROR'
-        status['message'] = msg
+        res['status'] = OrderedDict()
+        res['status']['type'] = 'ERROR'
+        res['status']['message'] = msg
 
-        return res
-
-    @staticmethod
-    def get_success_status(msg=''):
-        status = OrderedDict()
-        status['type'] = 'SUCCESS'
-        status['message'] = msg
-        return status
+        return json.dumps(res).encode('utf-8')
 
     def get_reply(self, data, msg=''):
         res = OrderedDict()
         res['callbackID'] = self.callbackID
         if data:
             res['data'] = data
-        res['status'] = self.get_success_status(msg)
-        return res
+
+        res['status'] = OrderedDict()
+        res['status']['type'] = 'SUCCESS'
+        res['status']['message'] = msg
+
+        return json.dumps(res).encode('utf-8')
 
     @staticmethod
     def data_protocol():

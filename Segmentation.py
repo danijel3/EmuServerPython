@@ -6,9 +6,9 @@ import re
 from collections import OrderedDict
 
 pl_sampa_map = {'ni': "n'", 'si': "s'", 'tsi': "ts'", 'zi': "z'", 'dzi': "dz'", 'en': 'e~', 'on': 'o~'}
-pl_ipa_map = {'e': u'ɛ', 'en': u'ɛ̃', 'I': u'ɨ', 'o': u'ɔ', 'on': u'ɔ̃', 'si': u'ɕ', 'dz': u'dz', 'dzi': u'dʑ',
-              'dZ': u'dʐ', 'g': u'ɡ', 'ni': u'ɲ', 'S': u'ʂ', 'tsi': u'tɕ', 'ts': u'ts', 'tS': u'tʂ', 'zi': u'ʑ',
-              'Z': u'ʐ'}
+pl_ipa_map = {'e': 'ɛ', 'en': 'ɛ̃', 'I': 'ɨ', 'o': 'ɔ', 'on': 'ɔ̃', 'si': 'ɕ', 'dz': 'dz', 'dzi': 'dʑ',
+              'dZ': 'dʐ', 'g': 'ɡ', 'ni': 'ɲ', 'S': 'ʂ', 'tsi': 'tɕ', 'ts': 'ts', 'tS': 'tʂ', 'zi': 'ʑ',
+              'Z': 'ʐ'}
 
 EPSILON = 0.01
 besi = re.compile('^.*_[BESI]$')
@@ -22,7 +22,7 @@ class Segment:
         self.len = len
         self.end = round(self.start + self.len, 2)
         self.text = text
-        self.id = idgen.next()
+        self.id = next(idgen)
 
     def wraps(self, other):
         return other.start - self.start > -EPSILON and other.end - self.end < EPSILON
@@ -114,7 +114,7 @@ class IDgen:
     def __init__(self):
         self.id_cnt = 0
 
-    def next(self):
+    def __next__(self):
         self.id_cnt += 1
         return self.id_cnt
 
@@ -129,7 +129,7 @@ class Segmentation:
         with codecs.open(file, encoding='utf-8', mode='r') as f:
             for l in f:
                 tok = l.strip().split(' ')
-                assert len(tok) == 5, u'Wrong tok count in file {}: {}'.format(file, l)
+                assert len(tok) == 5, 'Wrong tok count in file {}: {}'.format(file, l)
                 if tok[0][0] == '@':
                     ph = tok[4]
 
@@ -224,14 +224,14 @@ def annot_to_ctm(annot, samplerate=16000.0, name='input'):
         while ph < len(seg.phonemes.segments):
             phone = seg.phonemes.segments[ph]
             if phone.end <= word.start:
-                ret.append(u'@{} 1 {} {} {}\n'.format(name, phone.start, phone.len, phone.text))
+                ret.append('@{} 1 {} {} {}\n'.format(name, phone.start, phone.len, phone.text))
                 ph += 1
             else:
                 break
-        ret.append(u'{} 1 {} {} {}\n'.format(name, word.start, word.len, word.text))
+        ret.append('{} 1 {} {} {}\n'.format(name, word.start, word.len, word.text))
     while ph < len(seg.phonemes.segments):
         phone = seg.phonemes.segments[ph]
-        ret.append(u'@{} 1 {} {} {}\n'.format(name, phone.start, phone.len, phone.text))
+        ret.append('@{} 1 {} {} {}\n'.format(name, phone.start, phone.len, phone.text))
         ph += 1
 
-    return u''.join(ret)
+    return ''.join(ret)

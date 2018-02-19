@@ -1,0 +1,6 @@
+daemonize
+pymongo
+autobahn
+bcrypt
+Twisted
+service_identity

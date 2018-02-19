@@ -17,7 +17,7 @@ def load_settings(file):
     global settings
     with open(file) as f:
         new_settings = json.load(f)
-        for k, v in new_settings.iteritems():
+        for k, v in new_settings.items():
             settings[k] = v
 
 
