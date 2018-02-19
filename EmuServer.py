@@ -53,11 +53,10 @@ class EmuServerProtocol(WebSocketServerProtocol):
             else:
                 self.sendMessage(json.dumps(self.get_reply('NO')))
         elif req_type == 'LOGONUSER':
-            user = request['userName']
+            # user = request['userName']
             password = request['pwd']
             # self.sendMessage(json.dumps(self.get_reply('BADUSERNAME')))
-            if bcrypt.hashpw(password.encode('utf-8'), self.db.password.encode('utf-8')) != self.db.password.encode(
-                    'utf-8'):
+            if bcrypt.hashpw(password.encode('utf-8'), self.db.password) != str(self.db.password):
                 self.sendMessage(json.dumps(self.get_reply('BADPASSWORD')))
             else:
                 self.sendMessage(json.dumps(self.get_reply('LOGGEDON')))

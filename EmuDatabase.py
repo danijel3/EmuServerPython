@@ -51,7 +51,7 @@ class Database:
             raise RuntimeError
         self.work_dir = get_setting('work_dir')
         self.password = None
-        if 'password' in self.proj:
+        if self.proj['visibility'] == 'private':
             self.password = self.proj['password']
 
     def get_config(self):
@@ -63,7 +63,8 @@ class Database:
     def get_bundle_list(self):
         bundle_list = []
         for name, bundle in self.proj['bundles'].iteritems():
-            bundle_list.append({'name': name, 'session': bundle['session']})
+            if 'seg' in bundle and 'audio' in bundle:
+                bundle_list.append({'name': name, 'session': bundle['session']})
         bundle_list = sorted(bundle_list, key=lambda el: el['session'] + '_' + el['name'])
         return bundle_list
 
