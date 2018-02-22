@@ -4,12 +4,12 @@ Implementation of an EMU-webApp websocket server in Python. This branch is used 
 
 # Requirements
 
-Installable using *pip* or *easy_install*:
+Requirements are provided in the `requirements.txt` file and can be installed using:
 
-  * autobahn - for websockets
-  * monogodb
-  * pymongo
-  
+```
+pip install -r requirements.txt 
+```
+
 # usage
 
 Simply run **python ServerMain.py [setings.json]**. It will open a server at the given port. You can connect to it from 
@@ -25,10 +25,12 @@ Or use the following redirect address to auto-connect:
 
 A JSON with the following structure:
 
-    {
-            'port': 17890,
-            'logFile': None,
-            'daemonize': False,
-            'pid': 'emu_server.pid',
-            'work_dir': 'path/to/workdir'
-    }
+```
+{
+        'port': 17890,
+        'logFile': None,
+        'daemonize': False,
+        'pid': 'emu_server.pid',
+        'work_dir': 'path/to/workdir'
+}
+```
