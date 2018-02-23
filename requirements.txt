@@ -3,3 +3,5 @@ daemonize
 autobahn
 bcrypt
 Twisted
+pyopenssl
+service_identity
