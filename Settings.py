@@ -4,13 +4,18 @@ settings = {'port': 17890,
             'logFile': None,
             'daemonize': False,
             'pid': 'emu_server.pid',
-            'work_dir': 'path/to/workdir'}
+            'source': None}
 
 
-def get_setting(name):
-    if name in settings:
-        return settings[name]
-    return None
+def get_setting(name, *argv):
+    if name not in settings:
+        return None
+    ret = settings[name]
+    for arg in argv:
+        if arg not in ret:
+            return None
+        ret = ret[arg]
+    return ret
 
 
 def load_settings(file):

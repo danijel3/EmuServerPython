@@ -224,14 +224,15 @@ def annot_to_ctm(annot, samplerate=16000.0, name='input'):
         while ph < len(seg.phonemes.segments):
             phone = seg.phonemes.segments[ph]
             if phone.end <= word.start:
-                ret.append('@{} 1 {} {} {}\n'.format(name, phone.start, phone.len, phone.text))
+                ret.append(f'@{name} 1 { phone.start} {phone.len} {phone.text}\n')
                 ph += 1
             else:
                 break
-        ret.append('{} 1 {} {} {}\n'.format(name, word.start, word.len, word.text))
+        if word.text:
+            ret.append(f'{name} 1 {word.start} {word.len} {word.text}\n')
     while ph < len(seg.phonemes.segments):
         phone = seg.phonemes.segments[ph]
-        ret.append('@{} 1 {} {} {}\n'.format(name, phone.start, phone.len, phone.text))
+        ret.append(f'@{name} 1 { phone.start} {phone.len} {phone.text}\n')
         ph += 1
 
     return ''.join(ret)

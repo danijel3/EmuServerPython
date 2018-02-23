@@ -1,11 +1,10 @@
 import json
 from collections import OrderedDict
 
-import bcrypt
 from autobahn.twisted.websocket import WebSocketServerProtocol
 from twisted.python import log
 
-from EmuDatabase import get_database
+from EmuSource import get_source
 from Settings import get_setting
 
 
@@ -28,7 +27,7 @@ class EmuServerProtocol(WebSocketServerProtocol):
     def onConnect(self, request):
         log.msg("Client connecting: {0}".format(request.peer))
         self.path = request.path
-        self.db = get_database(request.path)
+        self.db = get_source(request.path)
 
     def onMessage(self, payload, is_binary):
 
@@ -48,15 +47,16 @@ class EmuServerProtocol(WebSocketServerProtocol):
         if req_type == 'GETPROTOCOL':
             self.sendMessage(self.get_reply(self.data_protocol()))
         elif req_type == 'GETDOUSERMANAGEMENT':
-            if self.db.password:
+            if self.db.do_login():
                 self.sendMessage(self.get_reply('YES'))
             else:
                 self.sendMessage(self.get_reply('NO'))
         elif req_type == 'LOGONUSER':
-            # user = request['userName']
+            user = request['userName']
             password = request['pwd']
-            # self.sendMessage(self.get_reply('BADUSERNAME')),
-            if bcrypt.hashpw(password.encode('utf-8'), self.db.password) != self.db.password:
+            if not self.db.check_user(user):
+                self.sendMessage(self.get_reply('BADUSERNAME'))
+            elif not self.db.check_login(user, password):
                 self.sendMessage(self.get_reply('BADPASSWORD'))
             else:
                 self.sendMessage(self.get_reply('LOGGEDON'))

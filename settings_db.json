@@ -1,0 +1,7 @@
+{
+  "port": 17890,
+  "source": {
+    "type": "ClarinDBSource",
+    "work_dir": "/home/guest/PycharmProjects/ClarinSpeechWebsite/work/"
+  }
+}

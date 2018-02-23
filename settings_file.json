@@ -1,0 +1,16 @@
+{
+  "port": 17891,
+  "source": {
+    "type": "FileSource",
+    "db_map": {
+      "/test": "/home/guest/PycharmProjects/CTMtoEMU/test",
+      "/ae": "/home/guest/PycharmProjects/CTMtoEMU/emuR_demoData/ae_emuDB",
+      "/clarin": "/home/guest/Desktop/Projects/Clarin/AlignTests/ForcedAlignMulti/clarin/emu"
+    },
+    "default_db": "/home/guest/PycharmProjects/CTMtoEMU/test",
+    "authorize": false,
+    "user": "user",
+    "pass": "pass",
+    "readonly": false
+  }
+}

@@ -1,6 +1,5 @@
-daemonize
 pymongo
+daemonize
 autobahn
 bcrypt
 Twisted
-service_identity
