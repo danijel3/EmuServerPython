@@ -4,6 +4,8 @@ settings = {'port': 17890,
             'logFile': None,
             'daemonize': False,
             'pid': 'emu_server.pid',
+            'secure': False,
+            'tls': {'private': 'server.key', 'cert': 'server.crt'},
             'source': None}
 
 

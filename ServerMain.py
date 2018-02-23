@@ -9,7 +9,7 @@ from Settings import get_setting, load_settings
 
 def run_server():
     from twisted.python import log
-    from twisted.internet import reactor
+    from twisted.internet import reactor, ssl
     from autobahn.twisted.websocket import WebSocketServerFactory
     from EmuServer import EmuServerProtocol
 
@@ -22,7 +22,15 @@ def run_server():
     factory = WebSocketServerFactory()
     factory.protocol = EmuServerProtocol
 
-    reactor.listenTCP(get_setting('port'), factory)
+    if get_setting('secure'):
+
+        contextFactory = ssl.DefaultOpenSSLContextFactory(get_setting('tls', 'private'),
+                                                          get_setting('tls', 'cert'))
+
+        reactor.listenSSL(get_setting('port'), factory, contextFactory)
+    else:
+        reactor.listenTCP(get_setting('port'), factory)
+
     reactor.run()
 
 
