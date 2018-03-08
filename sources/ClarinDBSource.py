@@ -55,7 +55,7 @@ class ClarinDBSource(EmuSource):
         bundle_list = []
         for name, bundle in self.proj['bundles'].items():
             if 'seg' in bundle and 'audio' in bundle:
-                bundle_list.append({'name': name, 'session': bundle['session']})
+                bundle_list.append({'name': bundle['name'], 'session': bundle['session']})
         bundle_list = sorted(bundle_list, key=lambda el: el['session'] + '_' + el['name'])
         return bundle_list
 
