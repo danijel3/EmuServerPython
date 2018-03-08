@@ -64,7 +64,7 @@ class ClarinDBSource(EmuSource):
         return self.work_dir / file['file']
 
     def get_bundle(self, session, bundle):
-        bndl = self.proj['bundles'][bundle]
+        bndl = self.proj['bundles'][f'{session}_{bundle}']
 
         ret = OrderedDict()
         ret['ssffFiles'] = []
@@ -80,7 +80,7 @@ class ClarinDBSource(EmuSource):
         return ret
 
     def save_bundle(self, session, bundle, data):
-        bndl = self.proj['bundles'][bundle]
+        bndl = self.proj['bundles'][f'{session}_{bundle}']
 
         work_dir = get_setting('source', 'work_dir')
 
