@@ -80,14 +80,14 @@ class FileSource(EmuSource):
             ssff_item['encoding'] = 'BASE64'
             ssff_item['data'] = self.get_file(bundle_path / f'{bundle}.{ext}', base64_enc=True)
 
-            wav = OrderedDict()
-            ret['mediaFile'] = wav
-            wav['encoding'] = 'BASE64'
-            wav['data'] = self.get_file(bundle_path / f'{bundle}.wav', base64_enc=True)
+        wav = OrderedDict()
+        ret['mediaFile'] = wav
+        wav['encoding'] = 'BASE64'
+        wav['data'] = self.get_file(bundle_path / f'{bundle}.wav', base64_enc=True)
 
-            with open(bundle_path / f'{bundle}_annot.json') as f:
-                annotation = json.load(f)
-            ret['annotation'] = annotation
+        with open(bundle_path / f'{bundle}_annot.json') as f:
+            annotation = json.load(f)
+        ret['annotation'] = annotation
 
         return ret
 

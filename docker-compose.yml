@@ -1,0 +1,10 @@
+version: '3.3'
+services:
+  emu:
+    image: "emu-server-python"
+    ports:
+      - "17890:17890"
+    volumes:
+      - ./corpora:/corpora
+      - ./settings.json:/app/settings.json
+    restart: always

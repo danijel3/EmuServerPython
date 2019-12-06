@@ -1,0 +1,17 @@
+{
+    "port": 17890,
+    "daemonize": false,
+    "secure": false,
+    "tls": {"private": "server.key", "cert": "server.crt"},
+    "source": {
+   	 "type": "FileSource",
+	    "db_map": {
+	      "/test": "/corpora/test_emuDB"
+	    },
+	    "default_db": "/test",
+	    "authorize": true,
+	    "user": "user",
+	    "pass": "pass",
+	    "readonly": false
+  }
+}

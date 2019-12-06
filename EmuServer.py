@@ -23,6 +23,7 @@ class EmuServerProtocol(WebSocketServerProtocol):
         self.callbackID = None
         self.db = None
         self.is_closed = Future()
+        self.is_open = Future()
 
     def onConnect(self, request):
         log.msg("Client connecting: {0}".format(request.peer))
