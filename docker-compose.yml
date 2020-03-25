@@ -8,3 +8,8 @@ services:
       - ./corpora:/corpora
       - ./settings.json:/app/settings.json
     restart: always
+  www:
+    image: "emu-server-ngnix"
+    ports:
+      - "80:80"
+    restart: always

@@ -8,7 +8,7 @@
 	    "db_map": {
 	      "/test": "/corpora/test_emuDB"
 	    },
-	    "default_db": "/test",
+	    "default_db": "/corpora/test_emuDB",
 	    "authorize": true,
 	    "user": "user",
 	    "pass": "pass",
